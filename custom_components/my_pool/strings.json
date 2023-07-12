@@ -1,0 +1,29 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up MyPool integration",
+        "description": "Set up your MyPool account",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_credentials": "Invalid credentials"
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "api_status": {
+        "name": "API Status"
+      }
+    },
+    "select": {
+      "temperature_unit": {
+        "name": "Temperature Unit"
+      }
+    }
+  }
+}
