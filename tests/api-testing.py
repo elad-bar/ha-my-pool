@@ -4,10 +4,8 @@ import logging
 import os
 import sys
 
+from custom_components.my_pool.managers.config_manager import ConfigManager
 from custom_components.my_pool.managers.rest_api import RestAPI
-from custom_components.my_pool.managers.config_manager import (
-    ConfigManager,
-)
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 DEBUG = str(os.environ.get("DEBUG", False)).lower() == str(True).lower()

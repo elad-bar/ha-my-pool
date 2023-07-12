@@ -12,8 +12,8 @@ from homeassistant.helpers.storage import Store
 from ..common.consts import (
     CONFIGURATION_FILE,
     DEFAULT_NAME,
-    STORAGE_DATA_TOKEN_KEY,
     STORAGE_DATA_KEY,
+    STORAGE_DATA_TOKEN_KEY,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -163,9 +163,7 @@ class ConfigManager:
         await self._load_encryption_key()
 
         if self._data is None:
-            self._data = {
-                STORAGE_DATA_TOKEN_KEY: None
-            }
+            self._data = {STORAGE_DATA_TOKEN_KEY: None}
 
             await self._save()
 

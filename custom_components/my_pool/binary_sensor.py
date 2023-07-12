@@ -6,10 +6,10 @@ from homeassistant.const import ATTR_ICON, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .managers.coordinator import Coordinator
-from .common.base_entity import async_setup_entities, BaseEntity
+from .common.base_entity import BaseEntity, async_setup_entities
 from .common.consts import ATTR_ATTRIBUTES, ATTR_IS_ON, SIGNAL_DEVICE_NEW
 from .common.entity_descriptions import IntegrationBinarySensorEntityDescription
+from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 

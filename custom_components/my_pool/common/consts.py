@@ -18,9 +18,7 @@ DATA_ITEM_DEVICES = "device"
 DATA_ITEM_MEMBER_DETAILS = "member-details"
 DATA_ITEM_CONFIG = "configuration"
 
-PRODUCT_PAGE = {
-    "G+": "resilience_g"
-}
+PRODUCT_PAGE = {"G+": "resilience_g"}
 
 ATTR_ATTRIBUTES = "attributes"
 ATTR_ACTIONS = "actions"
@@ -58,4 +56,3 @@ RUNTIME_AUTOMATION_STATE_CHANNEL_STATE = "runtime-automationState-channel*-state
 RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT = "runtime-automationState-channel*-timeLeft"
 
 UNIT_PH = "PH"
-

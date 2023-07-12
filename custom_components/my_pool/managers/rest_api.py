@@ -1,19 +1,20 @@
 """Platform for climate integration."""
-import logging
-import sys
 from asyncio import sleep
 from copy import copy
+import logging
+import sys
 
 from aiohttp import ClientResponseError, ClientSession
-from homeassistant.const import CONF_PASSWORD, CONF_EMAIL
+
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
-from .config_manager import ConfigManager
 from ..common.consts import API_MAX_ATTEMPTS, CONF_FCM_TOKEN, SIGNAL_DEVICE_NEW
 from ..common.endpoints import Endpoints
 from ..common.exceptions import InvalidTokenError, LoginError, OperationFailedException
+from .config_manager import ConfigManager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,9 +30,7 @@ class RestAPI:
 
     _api_status: bool
 
-    def __init__(
-        self, hass: HomeAssistant | None, config_manager: ConfigManager
-    ):
+    def __init__(self, hass: HomeAssistant | None, config_manager: ConfigManager):
         """Initialize the climate entity."""
 
         self._devices = {}
@@ -113,7 +112,7 @@ class RestAPI:
         request_data = {
             CONF_EMAIL: self._config_manager.username,
             CONF_PASSWORD: self._config_manager.password,
-            CONF_FCM_TOKEN: ""
+            CONF_FCM_TOKEN: "",
         }
 
         try:
@@ -152,11 +151,7 @@ class RestAPI:
 
         self._member_details = member_details
         self._devices = {
-            device.get("id"): {
-                "metadata": device,
-                "data": None
-            }
-            for device in devices
+            device.get("id"): {"metadata": device, "data": None} for device in devices
         }
 
         await self._config_manager.update_token_key(token)
@@ -262,9 +257,7 @@ class RestAPI:
                 raise cre
 
     async def _fetch_data(self, device_id: int):
-        request_data = {
-            "_deviceId": device_id
-        }
+        request_data = {"_deviceId": device_id}
 
         response = await self._get_request(Endpoints.DeviceStatus, request_data)
         success = response.get("success", False)
@@ -288,7 +281,9 @@ class RestAPI:
                 "Authorization": f"Bearer {self._config_manager.token}",
             }
 
-        async with self._session.post(url, headers=headers, json=data, ssl=False) as response:
+        async with self._session.post(
+            url, headers=headers, json=data, ssl=False
+        ) as response:
             response.raise_for_status()
 
             result = await response.json()
@@ -297,11 +292,8 @@ class RestAPI:
         return result
 
     async def _get_request(
-        self,
-        endpoint: Endpoints,
-        data: dict | None = None
+        self, endpoint: Endpoints, data: dict | None = None
     ) -> dict | None:
-
         query_string = ""
 
         if data is not None:
@@ -329,3 +321,6 @@ class RestAPI:
         device_data = copy(self._devices.get(device_id))
 
         return device_data
+
+    async def set_value(self, device_id: int, key: str, value: int):
+        pass

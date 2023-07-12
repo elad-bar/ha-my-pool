@@ -1,32 +1,42 @@
-import sys
 from copy import copy
 from datetime import timedelta
 import logging
+import sys
 from typing import Callable
 
-from homeassistant.const import Platform, ATTR_STATE
+from homeassistant.const import ATTR_STATE, Platform
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import slugify
 
-from .. import RestAPI
 from ..common.consts import (
+    ACTION_ENTITY_SELECT_OPTION,
+    ACTION_ENTITY_SET_NATIVE_VALUE,
+    ACTION_ENTITY_TURN_OFF,
+    ACTION_ENTITY_TURN_ON,
+    ATTR_ACTIONS,
+    ATTR_IS_ON,
     DATA_ITEM_CONFIG,
     DATA_ITEM_DEVICES,
     DATA_ITEM_MEMBER_DETAILS,
-    DOMAIN, PRODUCT_PAGE, PRODUCT_URL, ATTR_IS_ON, ATTR_ACTIONS, MANUFACTURER, ACTION_ENTITY_SELECT_OPTION,
-    ACTION_ENTITY_TURN_ON, ACTION_ENTITY_TURN_OFF, ACTION_ENTITY_SET_NATIVE_VALUE,
+    DOMAIN,
+    MANUFACTURER,
+    PRODUCT_PAGE,
+    PRODUCT_URL,
 )
-
+from ..common.entity_descriptions import (
+    DEFAULT_ENTITY_DESCRIPTIONS,
+    IntegrationEntityDescription,
+)
 from .config_manager import ConfigManager
-from ..common.entity_descriptions import DEFAULT_ENTITY_DESCRIPTIONS
+from .rest_api import RestAPI
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class Coordinator(DataUpdateCoordinator):
     """My custom coordinator."""
-    _data_mapping: dict[str, Callable[[int, EntityDescription], dict | None]] | None
+
     _entity_descriptions: dict[Platform, list[EntityDescription]] | None
     _api: RestAPI | None
     _config_manager: ConfigManager
@@ -48,7 +58,6 @@ class Coordinator(DataUpdateCoordinator):
         self._config_manager = config_manager
 
         self._api = None
-        self._data_mapping = None
         self._entity_descriptions = None
 
     @property
@@ -97,14 +106,13 @@ class Coordinator(DataUpdateCoordinator):
             manufacturer=MANUFACTURER,
             model=device_type,
             hw_version=version,
-            configuration_url=product_url
+            configuration_url=product_url,
         )
 
         return device_info
 
     async def initialize(self):
         self._load_entity_descriptions()
-        self._build_data_mapping()
 
         await self._api.initialize()
 
@@ -126,28 +134,51 @@ class Coordinator(DataUpdateCoordinator):
         except Exception as err:
             raise UpdateFailed(f"Error communicating with API: {err}")
 
-    def _build_data_mapping(self):
-        data_mapping = {
-            slugify(DATA_KEY_STATUS): self._get_status_data,
-        }
+    def get_device_action(
+        self,
+        entity_description: IntegrationEntityDescription,
+        device_id: int,
+        action_key: str,
+    ) -> Callable:
+        device_data = self.get_data(device_id, entity_description)
+        actions = device_data.get(ATTR_ACTIONS)
+        async_action = actions.get(action_key)
 
-        self._data_mapping = data_mapping
+        return async_action
 
-        _LOGGER.debug(f"Data retrieval mapping created, Mapping: {self._data_mapping}")
-
-    def get_data(self, entity_description: EntityDescription, device_id: int) -> dict | None:
-        result = None
-
+    def get_data(self, device_id: int, entity_description) -> dict | None:
         try:
-            handler = self._data_mapping.get(entity_description.key)
+            device_data = self._api.get_device_data(device_id)
+            data = device_data.get("data")
 
-            if handler is None:
-                _LOGGER.error(
-                    f"Handler was not found for {entity_description.key}, Entity Description: {entity_description}"
-                )
+            state = data.get(entity_description.key)
+
+            result = {}
+
+            if entity_description.platform in [Platform.BINARY_SENSOR, Platform.SWITCH]:
+                on_value = entity_description.on_value
+                is_on = on_value == state
+
+                result[ATTR_IS_ON] = is_on
 
             else:
-                result = handler(device_id, entity_description)
+                result[ATTR_STATE] = state
+
+            if entity_description.platform in [Platform.SELECT]:
+                result[ATTR_ACTIONS] = {
+                    ACTION_ENTITY_SELECT_OPTION: self._handle_select_action
+                }
+
+            elif entity_description.platform in [Platform.SWITCH]:
+                result[ATTR_ACTIONS] = {
+                    ACTION_ENTITY_TURN_ON: self._handle_turn_on_action,
+                    ACTION_ENTITY_TURN_OFF: self._handle_turn_off_action,
+                }
+
+            elif entity_description.platform in [Platform.NUMBER]:
+                result[ATTR_ACTIONS] = {
+                    ACTION_ENTITY_SET_NATIVE_VALUE: self._handle_set_number_action
+                }
 
         except Exception as ex:
             exc_type, exc_obj, tb = sys.exc_info()
@@ -157,49 +188,7 @@ class Coordinator(DataUpdateCoordinator):
                 f"Failed to extract data for {entity_description}, Error: {ex}, Line: {line_number}"
             )
 
-        return result
-
-    def get_device_action(
-        self, entity_description: EntityDescription, device_id: int, action_key: str
-    ) -> Callable:
-        device_data = self.get_data(entity_description, device_id)
-        actions = device_data.get(ATTR_ACTIONS)
-        async_action = actions.get(action_key)
-
-        return async_action
-
-    def _get_status_data(self, device_id: int, entity_description) -> dict | None:
-        device_data = self._api.get_device_data(device_id)
-        data = device_data.get("data")
-
-        state = data.get(entity_description.key)
-
-        result = {}
-
-        if entity_description.platform in [Platform.BINARY_SENSOR, Platform.SWITCH]:
-            on_value = entity_description.on_value
-            is_on = on_value == state
-
-            result[ATTR_IS_ON] = is_on
-
-        else:
-            result[ATTR_STATE] = state
-
-        if entity_description.platform in [Platform.SELECT]:
-            result[ATTR_ACTIONS] = {
-                ACTION_ENTITY_SELECT_OPTION: self._handle_select_action
-            }
-
-        elif entity_description.platform in [Platform.SWITCH]:
-            result[ATTR_ACTIONS] = {
-                ACTION_ENTITY_TURN_ON: self._handle_turn_on_action,
-                ACTION_ENTITY_TURN_OFF: self._handle_turn_off_action,
-            }
-
-        elif entity_description.platform in [Platform.NUMBER]:
-            result[ATTR_ACTIONS] = {
-                ACTION_ENTITY_SET_NATIVE_VALUE: self._handle_set_number_action
-            }
+            result = None
 
         return result
 
@@ -216,3 +205,31 @@ class Coordinator(DataUpdateCoordinator):
             entity_descriptions[ed.platform].append(ed)
 
         self._entity_descriptions = entity_descriptions
+
+    async def _handle_select_action(
+        self,
+        device_id: int,
+        entity_description: IntegrationEntityDescription,
+        option: str,
+    ):
+        value = int(option)
+
+        await self._api.set_value(device_id, entity_description.key, value)
+
+    async def _handle_turn_on_action(
+        self, device_id: int, entity_description: IntegrationEntityDescription
+    ):
+        await self._api.set_value(device_id, entity_description.key, 1)
+
+    async def _handle_turn_off_action(
+        self, device_id: int, entity_description: IntegrationEntityDescription
+    ):
+        await self._api.set_value(device_id, entity_description.key, 0)
+
+    def _handle_set_number_action(
+        self,
+        device_id: int,
+        entity_description: IntegrationEntityDescription,
+        intensity: int,
+    ):
+        await self._api.set_value(device_id, entity_description.key, intensity)

@@ -10,8 +10,8 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .common.consts import DEFAULT_NAME, DOMAIN
 from .common.exceptions import LoginError
-from .managers.rest_api import RestAPI
 from .managers.config_manager import ConfigManager
+from .managers.rest_api import RestAPI
 
 _LOGGER = logging.getLogger(__name__)
 

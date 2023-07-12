@@ -2,7 +2,6 @@ import logging
 import sys
 from typing import Any
 
-from .consts import DOMAIN
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -11,6 +10,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 
 from ..managers.coordinator import Coordinator
+from .consts import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class BaseEntity(CoordinatorEntity):
         entity_description: EntityDescription,
         coordinator: Coordinator,
         platform: Platform,
-        device_id: int
+        device_id: int,
     ):
         super().__init__(coordinator)
 
@@ -106,7 +106,9 @@ class BaseEntity(CoordinatorEntity):
     def _handle_coordinator_update(self) -> None:
         """Fetch new state parameters for the sensor."""
         try:
-            new_data = self._local_coordinator.get_data(self.entity_description, self._device_id)
+            new_data = self._local_coordinator.get_data(
+                self._device_id, self.entity_description
+            )
 
             if self._data != new_data:
                 _LOGGER.debug(f"Data for {self.unique_id}: {new_data}")

@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .common.consts import DATA_ITEM_CONFIG, DOMAIN, DATA_ITEM_MEMBER_DETAILS
+from .common.consts import DATA_ITEM_CONFIG, DATA_ITEM_MEMBER_DETAILS, DOMAIN
 from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)

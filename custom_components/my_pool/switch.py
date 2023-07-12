@@ -1,5 +1,5 @@
-import logging
 from abc import ABC
+import logging
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
@@ -8,10 +8,16 @@ from homeassistant.const import ATTR_ICON, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
-from .managers.coordinator import Coordinator
-from .common.base_entity import async_setup_entities, BaseEntity
-from .common.consts import ATTR_ATTRIBUTES, ATTR_IS_ON, SIGNAL_DEVICE_NEW, ACTION_ENTITY_TURN_ON, ACTION_ENTITY_TURN_OFF
+from .common.base_entity import BaseEntity, async_setup_entities
+from .common.consts import (
+    ACTION_ENTITY_TURN_OFF,
+    ACTION_ENTITY_TURN_ON,
+    ATTR_ATTRIBUTES,
+    ATTR_IS_ON,
+    SIGNAL_DEVICE_NEW,
+)
 from .common.entity_descriptions import IntegrationBinarySensorEntityDescription
+from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 

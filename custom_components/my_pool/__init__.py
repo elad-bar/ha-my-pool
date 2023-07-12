@@ -4,9 +4,8 @@ import sys
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .common.consts import DOMAIN, DEFAULT_NAME
+from .common.consts import DEFAULT_NAME, DOMAIN
 from .common.exceptions import LoginError
-from .managers.rest_api import RestAPI
 from .managers.config_manager import ConfigManager
 from .managers.coordinator import Coordinator
 
@@ -33,7 +32,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
             hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
-            await hass.config_entries.async_forward_entry_setups(entry, coordinator.platforms)
+            await hass.config_entries.async_forward_entry_setups(
+                entry, coordinator.platforms
+            )
 
             _LOGGER.info(
                 f"Start loading {DOMAIN} integration, Entry ID: {entry.entry_id}"

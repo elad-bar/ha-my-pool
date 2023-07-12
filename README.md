@@ -1,4 +1,4 @@
-# Home Assistant integration to Magen Ecoenergy MyPool devices 
+# Home Assistant integration to Magen Ecoenergy MyPool devices
 
 It allows controlling temperature, HVAC mode (heat, cool, auto, off) and fan mode (low, auto).
 It also reports all parameters available in sensors and sensors.
