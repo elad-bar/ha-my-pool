@@ -226,7 +226,7 @@ class Coordinator(DataUpdateCoordinator):
     ):
         await self._api.set_value(device_id, entity_description.key, 0)
 
-    def _handle_set_number_action(
+    async def _handle_set_number_action(
         self,
         device_id: int,
         entity_description: IntegrationEntityDescription,
