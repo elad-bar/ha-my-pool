@@ -17,146 +17,158 @@
   "entity": {
     "number": {
       "config_user_power": {
-        "name": "config_user_power"
+        "name": "Power on Cover Closed"
       },
-      "config_user_cover_power": {
-        "name": "config_user_cover_power"
+      "config_user_coverpower": {
+        "name": "Power on Cover Opened"
       },
       "config_user_ph": {
-        "name": "config_user_ph"
+        "name": "PH"
       },
       "config_user_orp": {
-        "name": "config_user_orp"
+        "name": "ORP"
       },
-      "config_technician_pool_size": {
-        "name": "config_technician_pool_size"
+      "config_technician_poolsize": {
+        "name": "Pool Size"
       }
     },
     "null": {
       "config_user_cl": {
-        "name": "config_user_cl"
+        "name": "CL"
       }
     },
     "switch": {
-      "config_technician_acid_pump_enable": {
-        "name": "config_technician_acid_pump_enable"
+      "config_technician_acidpump_enable": {
+        "name": "Acid Pump"
       },
       "config_automation_channel1_state": {
-        "name": "config_automation_channel1_state"
+        "name": "Automation 1"
       },
       "config_automation_channel2_state": {
-        "name": "config_automation_channel2_state"
+        "name": "Automation 2"
       },
       "config_automation_channel3_state": {
-        "name": "config_automation_channel3_state"
+        "name": "Automation 3"
       },
       "config_automation_channel4_state": {
-        "name": "config_automation_channel4_state"
+        "name": "Automation 4"
       },
       "config_automation_channel5_state": {
-        "name": "config_automation_channel5_state"
+        "name": "Automation 5"
       },
       "config_automation_channel6_state": {
-        "name": "config_automation_channel6_state"
+        "name": "Automation 6"
+      },
+      "config_automation_channel7_state": {
+        "name": "Automation 7"
       }
     },
     "binary_sensor": {
-      "is_device_connected": {
-        "name": "is_device_connected"
+      "isdeviceconnected": {
+        "name": "Connected"
       },
       "runtime_device_on": {
-        "name": "runtime_device_on"
+        "name": "Power"
       },
       "runtime_device_turbo": {
-        "name": "runtime_device_turbo"
+        "name": "Turbo"
       },
-      "runtime_automation_state_channel1_state": {
-        "name": "runtime_automation_state_channel1_state"
+      "runtime_automationstate_channel1_state": {
+        "name": "Automation 1"
       },
-      "runtime_automation_state_channel2_state": {
-        "name": "runtime_automation_state_channel2_state"
+      "runtime_automationstate_channel2_state": {
+        "name": "Automation2 "
       },
-      "runtime_automation_state_channel3_state": {
-        "name": "runtime_automation_state_channel3_state"
+      "runtime_automationstate_channel3_state": {
+        "name": "Automation 3"
       },
-      "runtime_automation_state_channel4_state": {
-        "name": "runtime_automation_state_channel4_state"
+      "runtime_automationstate_channel4_state": {
+        "name": "Automation 4"
       },
-      "runtime_automation_state_channel5_state": {
-        "name": "runtime_automation_state_channel5_state"
+      "runtime_automationstate_channel5_state": {
+        "name": "Automation 5"
       },
-      "runtime_automation_state_channel6_state": {
-        "name": "runtime_automation_state_channel6_state"
+      "runtime_automationstate_channel6_state": {
+        "name": "Automation 6"
+      },
+      "runtime_automationstate_channel7_state": {
+        "name": "Automation 7"
       }
     },
     "sensor": {
-      "runtime_device_turbo_time": {
-        "name": "runtime_device_turbo_time"
+      "runtime_device_turbotime": {
+        "name": "Turbo Time"
       },
       "runtime_ph_value": {
-        "name": "runtime_ph_value"
+        "name": "PH"
       },
       "runtime_orp_value": {
-        "name": "runtime_orp_value"
+        "name": "ORP"
       },
       "runtime_salinity_value": {
-        "name": "runtime_salinity_value"
+        "name": "Salinity"
       },
-      "runtime_cpu_temperature_value": {
-        "name": "runtime_cpu_temperature_value"
+      "runtime_cputemperature_value": {
+        "name": "CPU Temperature"
       },
-      "runtime_board_temperature_value": {
-        "name": "runtime_board_temperature_value"
+      "runtime_boardtemperature_value": {
+        "name": "Board Temperature"
       },
-      "runtime_water_temperature_value": {
-        "name": "runtime_water_temperature_value"
+      "runtime_watertemperature_value": {
+        "name": "Water Temperature"
       },
-      "runtime_cell__temperature_value": {
-        "name": "runtime_cell__temperature_value"
+      "runtime_cell_temperature_value": {
+        "name": "Cell Temperature"
       },
-      "runtime_acid_pump_days_left": {
-        "name": "runtime_acid_pump_days_left"
+      "runtime_acidpump_daysleft": {
+        "name": "Acid Pump Days Left"
       },
       "network_ssid": {
-        "name": "network_ssid"
+        "name": "Network SSID"
       },
-      "runtime_automation_state_channel1_time_left": {
-        "name": "runtime_automation_state_channel1_time_left"
+      "runtime_automationstate_channel1_timeleft": {
+        "name": "Automation 1 Time Left"
       },
-      "runtime_automation_state_channel2_time_left": {
-        "name": "runtime_automation_state_channel2_time_left"
+      "runtime_automationstate_channel2_timeleft": {
+        "name": "Automation 2 Time Left"
       },
-      "runtime_automation_state_channel3_time_left": {
-        "name": "runtime_automation_state_channel3_time_left"
+      "runtime_automationstate_channel3_timeleft": {
+        "name": "Automation 3 Time Left"
       },
-      "runtime_automation_state_channel4_time_left": {
-        "name": "runtime_automation_state_channel4_time_left"
+      "runtime_automationstate_channel4_timeleft": {
+        "name": "Automation 4 Time Left"
       },
-      "runtime_automation_state_channel5_time_left": {
-        "name": "runtime_automation_state_channel5_time_left"
+      "runtime_automationstate_channel5_timeleft": {
+        "name": "Automation 5 Time Left"
       },
-      "runtime_automation_state_channel6_time_left": {
-        "name": "runtime_automation_state_channel6_time_left"
+      "runtime_automationstate_channel6_timeleft": {
+        "name": "Automation 6 Time Left"
+      },
+      "runtime_automationstate_channel7_timeleft": {
+        "name": "Automation 7 Time Left"
       }
     },
     "select": {
       "config_automation_channel1_mode": {
-        "name": "config_automation_channel1_mode"
+        "name": "Automation 1 Mode"
       },
       "config_automation_channel2_mode": {
-        "name": "config_automation_channel2_mode"
+        "name": "Automation 2 Mode"
       },
       "config_automation_channel3_mode": {
-        "name": "config_automation_channel3_mode"
+        "name": "Automation 3 Mode"
       },
       "config_automation_channel4_mode": {
-        "name": "config_automation_channel4_mode"
+        "name": "Automation 4 Mode"
       },
       "config_automation_channel5_mode": {
-        "name": "config_automation_channel5_mode"
+        "name": "Automation 5 Mode"
       },
       "config_automation_channel6_mode": {
-        "name": "config_automation_channel6_mode"
+        "name": "Automation 6 Mode"
+      },
+      "config_automation_channel7_mode": {
+        "name": "Automation 7 Mode"
       }
     }
   }

@@ -92,11 +92,15 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         key=CONFIG_USER_POWER,
         device_class=NumberDeviceClass.POWER_FACTOR,
         entity_category=EntityCategory.CONFIG,
+        native_min_value=0,
+        native_max_value=100,
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_COVER_POWER,
         device_class=NumberDeviceClass.POWER_FACTOR,
         entity_category=EntityCategory.CONFIG,
+        native_min_value=0,
+        native_max_value=100,
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_PH,
@@ -115,7 +119,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_step=1,
         entity_category=EntityCategory.CONFIG,
     ),
-    IntegrationEntityDescription(
+    IntegrationNumberEntityDescription(
         key=CONFIG_USER_CL, entity_category=EntityCategory.CONFIG
     ),
     IntegrationNumberEntityDescription(
@@ -135,7 +139,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     IntegrationBinarySensorEntityDescription(
         key=IS_DEVICE_CONNECTED, on_value=str(True).lower()
     ),
-    IntegrationBinarySensorEntityDescription(key=RUNTIME_DEVICE_ON, on_value="1"),
+    IntegrationSwitchEntityDescription(key=RUNTIME_DEVICE_ON, on_value="1"),
     IntegrationBinarySensorEntityDescription(key=RUNTIME_DEVICE_TURBO, on_value="1"),
     IntegrationSensorEntityDescription(
         key=RUNTIME_DEVICE_TURBO_TIME,
@@ -189,12 +193,13 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
 ]
 
-for i in range(1, 7):
+for i in range(1, 8):
     index = str(i)
     automation_components = [
         IntegrationSelectEntityDescription(
             key=CONFIG_AUTOMATION_CHANNEL_MODE.replace("*", index),
             entity_category=EntityCategory.CONFIG,
+            options=["0"],
         ),
         IntegrationSwitchEntityDescription(
             key=CONFIG_AUTOMATION_CHANNEL_STATE.replace("*", index),

@@ -1,6 +1,7 @@
 """Platform for climate integration."""
 from asyncio import sleep
 from copy import copy
+import json
 import logging
 import sys
 
@@ -11,7 +12,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
-from ..common.consts import API_MAX_ATTEMPTS, CONF_FCM_TOKEN, SIGNAL_DEVICE_NEW
+from ..common.consts import (
+    API_MAX_ATTEMPTS,
+    CONF_FCM_TOKEN,
+    SIGNAL_DEVICE_NEW,
+    UPDATE_TELEMETRY_PARAMS,
+)
 from ..common.endpoints import Endpoints
 from ..common.exceptions import InvalidTokenError, LoginError, OperationFailedException
 from .config_manager import ConfigManager
@@ -323,4 +329,48 @@ class RestAPI:
         return device_data
 
     async def set_value(self, device_id: int, key: str, value: int):
-        pass
+        operation_description = (
+            f"update parameter {key} to {value}, Device: {device_id}"
+        )
+
+        if key in UPDATE_TELEMETRY_PARAMS:
+            key_parts = key.split("_")
+
+            request_data = {
+                "_deviceId": device_id,
+                "data": {key_parts[0]: {key_parts[1]: {key_parts[2]: value}}},
+            }
+
+            response = await self._post_request(Endpoints.UpdateTelemetry, request_data)
+            success = response.get("success", False)
+
+            if success:
+                _LOGGER.info(f"Successfully {operation_description}")
+            else:
+                _LOGGER.error(
+                    f"Failed to {operation_description}, Data: {json.dumps(response)}"
+                )
+
+        else:
+            _LOGGER.warning(f"Unsupported operation to {operation_description}")
+
+    async def set_direct_request(self, device_id: int, action_name: str, payload: dict):
+        operation_description = (
+            f"update parameter {action_name} to {payload}, Device: {device_id}"
+        )
+
+        request_data = {
+            "_deviceId": device_id,
+            "actionName": action_name,
+            "data": payload,
+        }
+
+        response = await self._post_request(Endpoints.UpdateTelemetry, request_data)
+        success = response.get("success", False)
+
+        if success:
+            _LOGGER.info(f"Successfully {operation_description}")
+        else:
+            _LOGGER.error(
+                f"Failed to {operation_description}, Data: {json.dumps(response)}"
+            )

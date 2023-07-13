@@ -1,6 +1,10 @@
+from datetime import timedelta
+
 DOMAIN = "my_pool"
 DEFAULT_NAME = "MyPool"
 MANUFACTURER = "Magen Ecoenergy"
+
+UPDATE_API = timedelta(minutes=5)
 
 SIGNAL_DEVICE_NEW = f"signal_{DOMAIN}_device_new"
 CONFIGURATION_FILE = f"{DOMAIN}.config.json"
@@ -56,3 +60,11 @@ RUNTIME_AUTOMATION_STATE_CHANNEL_STATE = "runtime-automationState-channel*-state
 RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT = "runtime-automationState-channel*-timeLeft"
 
 UNIT_PH = "PH"
+
+UPDATE_TELEMETRY_PARAMS = [
+    CONFIG_USER_POWER,
+    CONFIG_USER_COVER_POWER,
+    CONFIG_USER_PH,
+    CONFIG_USER_ORP,
+    CONFIG_USER_CL,
+]

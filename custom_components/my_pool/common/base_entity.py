@@ -5,12 +5,12 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify
 
 from ..managers.coordinator import Coordinator
 from .consts import DOMAIN
+from .entity_descriptions import IntegrationEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,31 +50,31 @@ def async_setup_entities(
 
 class BaseEntity(CoordinatorEntity):
     _device_id: int
+    _entity_description: IntegrationEntityDescription
+    _translations: dict
 
     def __init__(
         self,
-        entity_description: EntityDescription,
+        entity_description: IntegrationEntityDescription,
         coordinator: Coordinator,
-        platform: Platform,
         device_id: int,
     ):
         super().__init__(coordinator)
 
+        self._entity_description = entity_description
+        self.entity_description = entity_description
+
         device_info = coordinator.get_device(device_id)
-        device_name = device_info.get("name")
         identifiers = device_info.get("identifiers")
         serial_number = list(identifiers)[0][1]
 
-        entity_name = device_name
+        entity_name = coordinator.config_manager.get_entity_name(
+            entity_description, device_info
+        )
 
-        if entity_description.name is not None and len(entity_description.name) > 0:
-            entity_name = f"{entity_name} {entity_description.name}"
-
-        slugify_name = slugify(entity_name)
-
-        unique_id = slugify(f"{platform}_{serial_number}_{slugify_name}")
-
-        self.entity_description = entity_description
+        unique_id = slugify(
+            f"{entity_description.platform}_{serial_number}_{entity_description.key}"
+        )
 
         self._attr_device_info = device_info
         self._attr_name = entity_name
@@ -93,7 +93,7 @@ class BaseEntity(CoordinatorEntity):
 
     async def async_execute_device_action(self, key: str, *kwargs: Any):
         async_device_action = self._local_coordinator.get_device_action(
-            self.entity_description, self._device_id, key
+            self._entity_description, self._device_id, key
         )
 
         await async_device_action(*kwargs)

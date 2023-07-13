@@ -6,15 +6,19 @@ from cryptography.fernet import Fernet, InvalidToken
 from homeassistant.config_entries import STORAGE_VERSION, ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import translation
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.storage import Store
 
 from ..common.consts import (
     CONFIGURATION_FILE,
     DEFAULT_NAME,
+    DOMAIN,
     STORAGE_DATA_KEY,
     STORAGE_DATA_TOKEN_KEY,
 )
+from ..common.entity_descriptions import IntegrationEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,6 +52,7 @@ class ConfigManager:
         self._store = None
         self._entry_data = None
         self._store_data = None
+        self._translations = None
 
         self._is_set_up_mode = entry is None
         self._is_initialized = False
@@ -131,6 +136,10 @@ class ConfigManager:
             self._data[CONF_USERNAME] = self._entry_data.get(CONF_USERNAME)
             self._data[CONF_PASSWORD] = password
 
+            self._translations = await translation.async_get_translations(
+                self._hass, self._hass.config.language, "entity", {DOMAIN}
+            )
+
             self._is_initialized = True
 
         except InvalidToken:
@@ -147,6 +156,22 @@ class ConfigManager:
             _LOGGER.error(
                 f"Failed to initialize configuration manager, Error: {ex}, Line: {line_number}"
             )
+
+    def get_entity_name(
+        self, entity_description: IntegrationEntityDescription, device_info: DeviceInfo
+    ) -> str:
+        entity_key = entity_description.key
+        platform = entity_description.platform
+
+        device_name = device_info.get("name")
+
+        translation_key = f"component.{DOMAIN}.entity.{platform}.{entity_key}.name"
+
+        translated_name = self._translations.get(translation_key, device_name)
+
+        entity_name = f"{device_name} {translated_name}"
+
+        return entity_name
 
     def update_credentials(self, data: dict):
         self._entry_data = data
@@ -221,6 +246,10 @@ class ConfigManager:
             for key in self._data:
                 if key not in [CONF_PASSWORD, CONF_USERNAME]:
                     self._store_data[self._entry_id][key] = self._data[key]
+
+            for key in [CONF_PASSWORD, CONF_USERNAME]:
+                if key in self._store_data[self._entry_id]:
+                    self._store_data[self._entry_id].pop(key)
 
         await self._store.async_save(self._store_data)
 

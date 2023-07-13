@@ -1,6 +1,6 @@
 import logging
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_ICON, ATTR_STATE, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -8,11 +8,10 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .common.base_entity import BaseEntity, async_setup_entities
 from .common.consts import ATTR_ATTRIBUTES, SIGNAL_DEVICE_NEW
+from .common.entity_descriptions import IntegrationSensorEntityDescription
 from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
-
-CURRENT_DOMAIN = Platform.SENSOR
 
 
 async def async_setup_entry(
@@ -26,7 +25,7 @@ async def async_setup_entry(
         async_setup_entities(
             hass,
             entry,
-            CURRENT_DOMAIN,
+            Platform.SENSOR,
             device_id,
             IntegrationSensorEntity,
             async_add_entities,
@@ -42,10 +41,11 @@ class IntegrationSensorEntity(BaseEntity, SensorEntity):
 
     def __init__(
         self,
-        entity_description: SensorEntityDescription,
+        entity_description: IntegrationSensorEntityDescription,
         coordinator: Coordinator,
+        device_id: int,
     ):
-        super().__init__(entity_description, coordinator, CURRENT_DOMAIN)
+        super().__init__(entity_description, coordinator, device_id)
 
         self._attr_device_class = entity_description.device_class
 

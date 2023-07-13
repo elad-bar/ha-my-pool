@@ -4,6 +4,7 @@ import logging
 import sys
 from typing import Callable
 
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_STATE, Platform
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -23,6 +24,10 @@ from ..common.consts import (
     MANUFACTURER,
     PRODUCT_PAGE,
     PRODUCT_URL,
+    RUNTIME_DEVICE_ON,
+    RUNTIME_DEVICE_TURBO,
+    RUNTIME_DEVICE_TURBO_TIME,
+    UNIT_PH,
 )
 from ..common.entity_descriptions import (
     DEFAULT_ENTITY_DESCRIPTIONS,
@@ -57,7 +62,7 @@ class Coordinator(DataUpdateCoordinator):
 
         self._config_manager = config_manager
 
-        self._api = None
+        self._api = RestAPI(hass, config_manager)
         self._entity_descriptions = None
 
     @property
@@ -136,7 +141,7 @@ class Coordinator(DataUpdateCoordinator):
 
     def get_device_action(
         self,
-        entity_description: IntegrationEntityDescription,
+        entity_description,
         device_id: int,
         action_key: str,
     ) -> Callable:
@@ -155,9 +160,25 @@ class Coordinator(DataUpdateCoordinator):
 
             result = {}
 
+            if (
+                entity_description.platform in [Platform.SENSOR]
+                and entity_description.device_class == SensorDeviceClass.TEMPERATURE
+            ):
+                state_str = str(state)
+                state_str_fixed = f"{state_str[:2]}.{state_str[2:].ljust(2, '0')}"
+                state = float(state_str_fixed)
+
+            if (
+                entity_description.platform in [Platform.SENSOR, Platform.NUMBER]
+                and entity_description.native_unit_of_measurement == UNIT_PH
+            ):
+                state_str = str(state)
+                state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
+                state = float(state_str_fixed)
+
             if entity_description.platform in [Platform.BINARY_SENSOR, Platform.SWITCH]:
                 on_value = entity_description.on_value
-                is_on = on_value == state
+                is_on = str(on_value) == str(state)
 
                 result[ATTR_IS_ON] = is_on
 
@@ -199,7 +220,7 @@ class Coordinator(DataUpdateCoordinator):
             ed = copy(entity_description)
             ed.translation_key = slugify(ed.key)
 
-            if ed.platform not in entity_description:
+            if ed.platform not in entity_descriptions:
                 entity_descriptions[ed.platform] = []
 
             entity_descriptions[ed.platform].append(ed)
@@ -219,17 +240,39 @@ class Coordinator(DataUpdateCoordinator):
     async def _handle_turn_on_action(
         self, device_id: int, entity_description: IntegrationEntityDescription
     ):
-        await self._api.set_value(device_id, entity_description.key, 1)
+        await self._handle_turn_x_action(device_id, entity_description, True)
 
     async def _handle_turn_off_action(
         self, device_id: int, entity_description: IntegrationEntityDescription
     ):
-        await self._api.set_value(device_id, entity_description.key, 0)
+        await self._handle_turn_x_action(device_id, entity_description, False)
+
+    async def _handle_turn_x_action(
+        self,
+        device_id: int,
+        entity_description: IntegrationEntityDescription,
+        value: bool,
+    ):
+        value_int = 1 if value else 0
+
+        if entity_description.key in [RUNTIME_DEVICE_ON]:
+            turbo_data = self.get_data(device_id, RUNTIME_DEVICE_TURBO)
+            turbo_time_data = self.get_data(device_id, RUNTIME_DEVICE_TURBO_TIME)
+
+            turbo = turbo_data.get(ATTR_STATE)
+            turbo_time = turbo_time_data.get(ATTR_STATE)
+
+            request_data = {"state": value_int, "turbo": turbo, "turboTime": turbo_time}
+
+            await self._api.set_direct_request(device_id, "DeviceAction", request_data)
+
+        else:
+            await self._api.set_value(device_id, entity_description.key, value_int)
 
     async def _handle_set_number_action(
         self,
         device_id: int,
         entity_description: IntegrationEntityDescription,
-        intensity: int,
+        value: int,
     ):
-        await self._api.set_value(device_id, entity_description.key, intensity)
+        await self._api.set_value(device_id, entity_description.key, value)

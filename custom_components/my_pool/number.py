@@ -1,7 +1,7 @@
 from abc import ABC
 import logging
 
-from homeassistant.components.number import NumberEntity, NumberEntityDescription
+from homeassistant.components.number import NumberEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_STATE, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -13,11 +13,10 @@ from .common.consts import (
     ATTR_ATTRIBUTES,
     SIGNAL_DEVICE_NEW,
 )
+from .common.entity_descriptions import IntegrationNumberEntityDescription
 from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
-
-CURRENT_DOMAIN = Platform.NUMBER
 
 
 async def async_setup_entry(
@@ -31,7 +30,7 @@ async def async_setup_entry(
         async_setup_entities(
             hass,
             entry,
-            CURRENT_DOMAIN,
+            Platform.NUMBER,
             device_id,
             IntegrationNumberEntity,
             async_add_entities,
@@ -47,10 +46,11 @@ class IntegrationNumberEntity(BaseEntity, NumberEntity, ABC):
 
     def __init__(
         self,
-        entity_description: NumberEntityDescription,
+        entity_description: IntegrationNumberEntityDescription,
         coordinator: Coordinator,
+        device_id: int,
     ):
-        super().__init__(entity_description, coordinator, CURRENT_DOMAIN)
+        super().__init__(entity_description, coordinator, device_id)
 
         self._attr_native_min_value = entity_description.native_min_value
         self._attr_native_max_value = entity_description.native_max_value

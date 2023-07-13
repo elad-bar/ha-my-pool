@@ -1,7 +1,7 @@
 from abc import ABC
 import logging
 
-from homeassistant.components.select import SelectEntity, SelectEntityDescription
+from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_STATE, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -13,11 +13,10 @@ from .common.consts import (
     ATTR_ATTRIBUTES,
     SIGNAL_DEVICE_NEW,
 )
+from .common.entity_descriptions import IntegrationSelectEntityDescription
 from .managers.coordinator import Coordinator
 
 _LOGGER = logging.getLogger(__name__)
-
-CURRENT_DOMAIN = Platform.SELECT
 
 
 async def async_setup_entry(
@@ -31,7 +30,7 @@ async def async_setup_entry(
         async_setup_entities(
             hass,
             entry,
-            CURRENT_DOMAIN,
+            Platform.SELECT,
             device_id,
             IntegrationSelectEntity,
             async_add_entities,
@@ -47,10 +46,11 @@ class IntegrationSelectEntity(BaseEntity, SelectEntity, ABC):
 
     def __init__(
         self,
-        entity_description: SelectEntityDescription,
+        entity_description: IntegrationSelectEntityDescription,
         coordinator: Coordinator,
+        device_id: int,
     ):
-        super().__init__(entity_description, coordinator, CURRENT_DOMAIN)
+        super().__init__(entity_description, coordinator, device_id)
 
         self.entity_description = entity_description
 

@@ -3,4 +3,5 @@ class Endpoints:
     Login = "auth/loginMember"
     CheckToken = "member/checkToken"
     DeviceStatus = "device/getDeviceState"
-    DeviceControl = ""
+    UpdateTelemetry = "device/updateTelemetry"
+    DirectMethod = "device/directMethod"
