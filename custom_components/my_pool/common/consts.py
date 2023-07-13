@@ -54,12 +54,13 @@ RUNTIME_WATER_TEMPERATURE_VALUE = "runtime-waterTemperature-value"
 RUNTIME_CELL_TEMPERATURE_VALUE = "runtime-cell-temperature-value"
 RUNTIME_ACID_PUMP_DAYS_LEFT = "runtime-acidPump-daysLeft"
 NETWORK_SSID = "network-ssid"
+NETWORK_RCPI = "network-rcpi"
 CONFIG_AUTOMATION_CHANNEL_MODE = "config-automation-channel*-mode"
 CONFIG_AUTOMATION_CHANNEL_STATE = "config-automation-channel*-state"
 RUNTIME_AUTOMATION_STATE_CHANNEL_STATE = "runtime-automationState-channel*-state"
 RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT = "runtime-automationState-channel*-timeLeft"
 
-UNIT_PH = "PH"
+UNIT_PH = "ph"
 
 UPDATE_TELEMETRY_PARAMS = [
     CONFIG_USER_POWER,

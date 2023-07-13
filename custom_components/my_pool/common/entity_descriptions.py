@@ -11,6 +11,7 @@ from custom_components.my_pool.common.consts import (
     CONFIG_USER_PH,
     CONFIG_USER_POWER,
     IS_DEVICE_CONNECTED,
+    NETWORK_RCPI,
     NETWORK_SSID,
     RUNTIME_ACID_PUMP_DAYS_LEFT,
     RUNTIME_AUTOMATION_STATE_CHANNEL_STATE,
@@ -35,6 +36,7 @@ from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.const import (
     CONCENTRATION_PARTS_PER_MILLION,
     PERCENTAGE,
+    SIGNAL_STRENGTH_DECIBELS,
     EntityCategory,
     Platform,
     UnitOfElectricPotential,
@@ -212,6 +214,13 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationSensorEntityDescription(
         key=NETWORK_SSID, name="SSID", entity_category=EntityCategory.DIAGNOSTIC
+    ),
+    IntegrationSensorEntityDescription(
+        key=NETWORK_RCPI,
+        name="Signal",
+        device_class=SensorDeviceClass.SIGNAL_STRENGTH,
+        native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
 ]
 

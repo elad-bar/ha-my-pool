@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.3
+
+- Add WIFI signal strength sensor
+
 ## v1.0.2
 
 - Fix translations

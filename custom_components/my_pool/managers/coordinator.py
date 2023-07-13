@@ -2,7 +2,7 @@ from copy import copy
 from datetime import timedelta
 import logging
 import sys
-from typing import Callable
+from typing import Any, Callable
 
 from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_STATE, Platform
@@ -43,6 +43,7 @@ class Coordinator(DataUpdateCoordinator):
     """My custom coordinator."""
 
     _entity_descriptions: dict[Platform, list[EntityDescription]] | None
+    _data_retrievers: dict[Platform, Callable[[int, Any], dict]] | None
     _api: RestAPI | None
     _config_manager: ConfigManager
 
@@ -64,6 +65,7 @@ class Coordinator(DataUpdateCoordinator):
 
         self._api = RestAPI(hass, config_manager)
         self._entity_descriptions = None
+        self._data_retrievers = None
 
     @property
     def config_manager(self):
@@ -117,6 +119,7 @@ class Coordinator(DataUpdateCoordinator):
         return device_info
 
     async def initialize(self):
+        self._load_data_retrievers()
         self._load_entity_descriptions()
 
         await self._api.initialize()
@@ -151,6 +154,80 @@ class Coordinator(DataUpdateCoordinator):
 
         return async_action
 
+    def _sensor_state_handler(self, state: int, entity_description):
+        if entity_description.device_class == SensorDeviceClass.TEMPERATURE:
+            state_str = str(state)
+            state_str_fixed = f"{state_str[:2]}.{state_str[2:].ljust(2, '0')}"
+            state = float(state_str_fixed)
+
+        elif entity_description.device_class == SensorDeviceClass.SIGNAL_STRENGTH:
+            state = (state / 2) - 110
+
+        elif entity_description.native_unit_of_measurement == UNIT_PH:
+            state_str = str(state)
+            state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
+            state = float(state_str_fixed)
+
+        result = {ATTR_STATE: state}
+
+        return result
+
+    def _load_data_retrievers(self):
+        data_retrievers = {
+            Platform.SENSOR: self._sensor_state_handler,
+            Platform.SELECT: self._select_state_handler,
+            Platform.BINARY_SENSOR: self._binary_sensor_state_handler,
+            Platform.SWITCH: self._switch_state_handler,
+            Platform.NUMBER: self._number_state_handler,
+        }
+
+        self._data_retrievers = data_retrievers
+
+    def _select_state_handler(self, state: int, _entity_description):
+        result = {
+            ATTR_STATE: state,
+            ATTR_ACTIONS: {ACTION_ENTITY_SELECT_OPTION: self._handle_select_action},
+        }
+
+        return result
+
+    def _binary_sensor_state_handler(self, state: int, entity_description):
+        on_value = entity_description.on_value
+        is_on = str(on_value) == str(state)
+
+        result = {ATTR_IS_ON: is_on}
+
+        return result
+
+    def _switch_state_handler(self, state: int, entity_description):
+        on_value = entity_description.on_value
+        is_on = str(on_value) == str(state)
+
+        result = {
+            ATTR_IS_ON: is_on,
+            ATTR_ACTIONS: {
+                ACTION_ENTITY_TURN_ON: self._handle_turn_on_action,
+                ACTION_ENTITY_TURN_OFF: self._handle_turn_off_action,
+            },
+        }
+
+        return result
+
+    def _number_state_handler(self, state: int, entity_description):
+        if entity_description.native_unit_of_measurement == UNIT_PH:
+            state_str = str(state)
+            state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
+            state = float(state_str_fixed)
+
+        result = {
+            ATTR_STATE: state,
+            ATTR_ACTIONS: {
+                ACTION_ENTITY_SET_NATIVE_VALUE: self._handle_set_number_action
+            },
+        }
+
+        return result
+
     def get_data(self, device_id: int, entity_description) -> dict | None:
         try:
             device_data = self._api.get_device_data(device_id)
@@ -158,48 +235,11 @@ class Coordinator(DataUpdateCoordinator):
 
             state = data.get(entity_description.key)
 
-            result = {}
+            data_retriever = self._data_retrievers.get(
+                entity_description.platform, Platform.SENSOR
+            )
 
-            if (
-                entity_description.platform in [Platform.SENSOR]
-                and entity_description.device_class == SensorDeviceClass.TEMPERATURE
-            ):
-                state_str = str(state)
-                state_str_fixed = f"{state_str[:2]}.{state_str[2:].ljust(2, '0')}"
-                state = float(state_str_fixed)
-
-            if (
-                entity_description.platform in [Platform.SENSOR, Platform.NUMBER]
-                and entity_description.native_unit_of_measurement == UNIT_PH
-            ):
-                state_str = str(state)
-                state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
-                state = float(state_str_fixed)
-
-            if entity_description.platform in [Platform.BINARY_SENSOR, Platform.SWITCH]:
-                on_value = entity_description.on_value
-                is_on = str(on_value) == str(state)
-
-                result[ATTR_IS_ON] = is_on
-
-            else:
-                result[ATTR_STATE] = state
-
-            if entity_description.platform in [Platform.SELECT]:
-                result[ATTR_ACTIONS] = {
-                    ACTION_ENTITY_SELECT_OPTION: self._handle_select_action
-                }
-
-            elif entity_description.platform in [Platform.SWITCH]:
-                result[ATTR_ACTIONS] = {
-                    ACTION_ENTITY_TURN_ON: self._handle_turn_on_action,
-                    ACTION_ENTITY_TURN_OFF: self._handle_turn_off_action,
-                }
-
-            elif entity_description.platform in [Platform.NUMBER]:
-                result[ATTR_ACTIONS] = {
-                    ACTION_ENTITY_SET_NATIVE_VALUE: self._handle_set_number_action
-                }
+            result = data_retriever(state, entity_description)
 
         except Exception as ex:
             exc_type, exc_obj, tb = sys.exc_info()
