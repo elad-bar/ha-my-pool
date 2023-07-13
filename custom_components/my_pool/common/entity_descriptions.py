@@ -90,6 +90,7 @@ class IntegrationSwitchEntityDescription(
 DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_POWER,
+        name="Power on Cover Closed",
         device_class=NumberDeviceClass.POWER_FACTOR,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
@@ -97,6 +98,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_COVER_POWER,
+        name="Power on Cover Opened",
         device_class=NumberDeviceClass.POWER_FACTOR,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
@@ -104,6 +106,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_PH,
+        name="PH",
         native_min_value=6.5,
         native_max_value=8.5,
         native_step=0.1,
@@ -112,6 +115,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_ORP,
+        name="ORP",
         device_class=NumberDeviceClass.VOLTAGE,
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
         native_min_value=550,
@@ -120,10 +124,11 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         entity_category=EntityCategory.CONFIG,
     ),
     IntegrationNumberEntityDescription(
-        key=CONFIG_USER_CL, entity_category=EntityCategory.CONFIG
+        key=CONFIG_USER_CL, name="Chlorine Level", entity_category=EntityCategory.CONFIG
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_TECHNICIAN_POOL_SIZE,
+        name="Pool Size",
         device_class=NumberDeviceClass.WATER,
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         native_min_value=1,
@@ -133,63 +138,76 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationSwitchEntityDescription(
         key=CONFIG_TECHNICIAN_ACID_PUMP_ENABLE,
+        name="Acid Pump Enabled",
         on_value="1",
         entity_category=EntityCategory.CONFIG,
     ),
     IntegrationBinarySensorEntityDescription(
-        key=IS_DEVICE_CONNECTED, on_value=str(True).lower()
+        key=IS_DEVICE_CONNECTED, name="Connected", on_value=str(True).lower()
     ),
-    IntegrationSwitchEntityDescription(key=RUNTIME_DEVICE_ON, on_value="1"),
-    IntegrationBinarySensorEntityDescription(key=RUNTIME_DEVICE_TURBO, on_value="1"),
+    IntegrationSwitchEntityDescription(
+        key=RUNTIME_DEVICE_ON, name="Power", on_value="1"
+    ),
+    IntegrationBinarySensorEntityDescription(
+        key=RUNTIME_DEVICE_TURBO, name="Turbo", on_value="1"
+    ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_DEVICE_TURBO_TIME,
+        name="Turbo Time",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.HOURS,
     ),
     IntegrationSensorEntityDescription(
-        key=RUNTIME_PH_VALUE, native_unit_of_measurement=UNIT_PH
+        key=RUNTIME_PH_VALUE, name="PH", native_unit_of_measurement=UNIT_PH
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ORP_VALUE,
+        name="ORP",
         device_class=SensorDeviceClass.VOLTAGE,
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_SALINITY_VALUE,
+        name="Salinity",
         native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_CPU_TEMPERATURE_VALUE,
+        name="CPU Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_BOARD_TEMPERATURE_VALUE,
+        name="Board Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_WATER_TEMPERATURE_VALUE,
+        name="Water Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_CELL_TEMPERATURE_VALUE,
+        name="Cell Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ACID_PUMP_DAYS_LEFT,
+        name="Acid Pump Days Left",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.DAYS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     IntegrationSensorEntityDescription(
-        key=NETWORK_SSID, entity_category=EntityCategory.DIAGNOSTIC
+        key=NETWORK_SSID, name="SSID", entity_category=EntityCategory.DIAGNOSTIC
     ),
 ]
 
@@ -198,22 +216,26 @@ for i in range(1, 8):
     automation_components = [
         IntegrationSelectEntityDescription(
             key=CONFIG_AUTOMATION_CHANNEL_MODE.replace("*", index),
+            name=f"Automation {i} Mode",
             entity_category=EntityCategory.CONFIG,
             options=["0"],
         ),
         IntegrationSwitchEntityDescription(
             key=CONFIG_AUTOMATION_CHANNEL_STATE.replace("*", index),
+            name=f"Automation {i}",
             on_value="1",
             entity_category=EntityCategory.CONFIG,
         ),
         IntegrationSensorEntityDescription(
             key=RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT.replace("*", index),
+            name=f"Automation {i} Time Left",
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.MINUTES,
             entity_category=EntityCategory.DIAGNOSTIC,
         ),
         IntegrationBinarySensorEntityDescription(
             key=RUNTIME_AUTOMATION_STATE_CHANNEL_STATE.replace("*", index),
+            name=f"Automation {i}",
             on_value="1",
             entity_category=EntityCategory.DIAGNOSTIC,
         ),

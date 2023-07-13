@@ -30,9 +30,7 @@
       },
       "config_technician_poolsize": {
         "name": "Pool Size"
-      }
-    },
-    "null": {
+      },
       "config_user_cl": {
         "name": "Chlorine Level"
       }
@@ -117,7 +115,7 @@
       "runtime_watertemperature_value": {
         "name": "Water Temperature"
       },
-      "runtime_celltemperature_value": {
+      "runtime_cell_temperature_value": {
         "name": "Cell Temperature"
       },
       "runtime_acidpump_daysleft": {
