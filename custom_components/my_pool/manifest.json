@@ -1,6 +1,6 @@
 {
   "domain": "my_pool",
-  "name": "MyPool",
+  "name": "My-Pool",
   "codeowners": ["@elad-bar"],
   "config_flow": true,
   "dependencies": [],
@@ -8,5 +8,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/elad-bar/ha-my-pool/issues",
   "requirements": [],
-  "version": "1.0.1"
+  "version": "1.0.2"
 }

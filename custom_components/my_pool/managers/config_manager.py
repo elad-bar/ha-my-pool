@@ -1,3 +1,4 @@
+import json
 import logging
 import sys
 
@@ -10,6 +11,7 @@ from homeassistant.helpers import translation
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.json import JSONEncoder
 from homeassistant.helpers.storage import Store
+from homeassistant.util import slugify
 
 from ..common.consts import (
     CONFIGURATION_FILE,
@@ -140,6 +142,10 @@ class ConfigManager:
                 self._hass, self._hass.config.language, "entity", {DOMAIN}
             )
 
+            _LOGGER.debug(
+                f"Translations loaded, Data: {json.dumps(self._translations)}"
+            )
+
             self._is_initialized = True
 
         except InvalidToken:
@@ -160,7 +166,7 @@ class ConfigManager:
     def get_entity_name(
         self, entity_description: IntegrationEntityDescription, device_info: DeviceInfo
     ) -> str:
-        entity_key = entity_description.key
+        entity_key = slugify(entity_description.key)
         platform = entity_description.platform
 
         device_name = device_info.get("name")
@@ -171,7 +177,16 @@ class ConfigManager:
             translation_key, entity_description.name
         )
 
-        entity_name = f"{device_name} {translated_name}"
+        _LOGGER.debug(
+            f"Translations requested '{device_name}', Key: {translation_key}, "
+            f"Entity: {entity_description.name}, Value: {translated_name}"
+        )
+
+        entity_name = (
+            device_name
+            if translated_name is None or translated_name == ""
+            else f"{device_name} {translated_name}"
+        )
 
         return entity_name
 

@@ -30,9 +30,6 @@
       },
       "config_technician_poolsize": {
         "name": "Pool Size"
-      },
-      "config_user_cl": {
-        "name": "Chlorine Level"
       }
     },
     "switch": {
@@ -94,6 +91,9 @@
       }
     },
     "sensor": {
+      "config_user_cl": {
+        "name": "Chlorine Level"
+      },
       "runtime_device_turbotime": {
         "name": "Turbo Time"
       },

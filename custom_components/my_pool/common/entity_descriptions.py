@@ -34,6 +34,7 @@ from homeassistant.components.sensor import SensorDeviceClass, SensorEntityDescr
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.const import (
     CONCENTRATION_PARTS_PER_MILLION,
+    PERCENTAGE,
     EntityCategory,
     Platform,
     UnitOfElectricPotential,
@@ -123,8 +124,11 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_step=1,
         entity_category=EntityCategory.CONFIG,
     ),
-    IntegrationNumberEntityDescription(
-        key=CONFIG_USER_CL, name="Chlorine Level", entity_category=EntityCategory.CONFIG
+    IntegrationSensorEntityDescription(
+        key=CONFIG_USER_CL,
+        name="Chlorine Level",
+        entity_category=EntityCategory.CONFIG,
+        native_unit_of_measurement=PERCENTAGE,
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_TECHNICIAN_POOL_SIZE,
