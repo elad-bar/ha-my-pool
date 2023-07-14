@@ -28,7 +28,10 @@ from custom_components.my_pool.common.consts import (
     RUNTIME_WATER_TEMPERATURE_VALUE,
     UNIT_PH,
 )
-from homeassistant.components.binary_sensor import BinarySensorEntityDescription
+from homeassistant.components.binary_sensor import (
+    BinarySensorDeviceClass,
+    BinarySensorEntityDescription,
+)
 from homeassistant.components.number import NumberDeviceClass, NumberEntityDescription
 from homeassistant.components.select import SelectEntityDescription
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntityDescription
@@ -98,6 +101,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=100,
+        icon="mdi:lock",
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_COVER_POWER,
@@ -106,6 +110,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=100,
+        icon="mdi:lock-open",
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_PH,
@@ -115,6 +120,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_step=0.1,
         native_unit_of_measurement=UNIT_PH,
         entity_category=EntityCategory.CONFIG,
+        icon="mdi:ph",
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_ORP,
@@ -141,6 +147,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_max_value=100,
         native_step=1,
         entity_category=EntityCategory.CONFIG,
+        icon="mdi:move-resize",
     ),
     IntegrationSwitchEntityDescription(
         key=CONFIG_TECHNICIAN_ACID_PUMP_ENABLE,
@@ -149,22 +156,32 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         entity_category=EntityCategory.CONFIG,
     ),
     IntegrationBinarySensorEntityDescription(
-        key=IS_DEVICE_CONNECTED, name="Connected", on_value=str(True).lower()
+        key=IS_DEVICE_CONNECTED,
+        name="Connected",
+        on_value=str(True).lower(),
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
     ),
     IntegrationSwitchEntityDescription(
         key=RUNTIME_DEVICE_ON, name="Power", on_value="1"
     ),
     IntegrationBinarySensorEntityDescription(
-        key=RUNTIME_DEVICE_TURBO, name="Turbo", on_value="1"
+        key=RUNTIME_DEVICE_TURBO,
+        name="Turbo",
+        on_value="1",
+        icon="mdi:truck-fast-outline",
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_DEVICE_TURBO_TIME,
         name="Turbo Time",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.HOURS,
+        icon="mdi:truck-fast-outline",
     ),
     IntegrationSensorEntityDescription(
-        key=RUNTIME_PH_VALUE, name="PH", native_unit_of_measurement=UNIT_PH
+        key=RUNTIME_PH_VALUE,
+        name="PH",
+        native_unit_of_measurement=UNIT_PH,
+        icon="mdi:ph",
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ORP_VALUE,
@@ -175,6 +192,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     IntegrationSensorEntityDescription(
         key=RUNTIME_SALINITY_VALUE,
         name="Salinity",
+        icon="mdi:shaker-outline",
         native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
     ),
     IntegrationSensorEntityDescription(
@@ -195,6 +213,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         key=RUNTIME_WATER_TEMPERATURE_VALUE,
         name="Water Temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
+        icon="mdi:pool-thermometer",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
@@ -211,6 +230,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.DAYS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        icon="mdi:autorenew",
     ),
     IntegrationSensorEntityDescription(
         key=NETWORK_SSID, name="SSID", entity_category=EntityCategory.DIAGNOSTIC

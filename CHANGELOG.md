@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.4
+
+- Update icons
+
 ## v1.0.3
 
 - Add WIFI signal strength sensor
