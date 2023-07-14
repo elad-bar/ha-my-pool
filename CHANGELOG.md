@@ -1,8 +1,9 @@
 # Changelog
 
-## v1.0.4
+## v1.0.5
 
-- Update icons
+- Update sensor device class
+- Fix binary sensor state
 
 ## v1.0.3
 

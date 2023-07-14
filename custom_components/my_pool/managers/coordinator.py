@@ -193,7 +193,7 @@ class Coordinator(DataUpdateCoordinator):
 
     def _binary_sensor_state_handler(self, state: int, entity_description):
         on_value = entity_description.on_value
-        is_on = str(on_value) == str(state)
+        is_on = str(on_value).lower() == str(state).lower()
 
         result = {ATTR_IS_ON: is_on}
 
@@ -201,7 +201,7 @@ class Coordinator(DataUpdateCoordinator):
 
     def _switch_state_handler(self, state: int, entity_description):
         on_value = entity_description.on_value
-        is_on = str(on_value) == str(state)
+        is_on = str(on_value).lower() == str(state).lower()
 
         result = {
             ATTR_IS_ON: is_on,

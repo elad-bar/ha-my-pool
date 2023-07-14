@@ -34,7 +34,11 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.components.number import NumberDeviceClass, NumberEntityDescription
 from homeassistant.components.select import SelectEntityDescription
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.components.switch import SwitchEntityDescription
 from homeassistant.const import (
     CONCENTRATION_PARTS_PER_MILLION,
@@ -174,7 +178,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         key=RUNTIME_DEVICE_TURBO_TIME,
         name="Turbo Time",
         device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.HOURS,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         icon="mdi:truck-fast-outline",
     ),
     IntegrationSensorEntityDescription(
@@ -182,18 +186,21 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         name="PH",
         native_unit_of_measurement=UNIT_PH,
         icon="mdi:ph",
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ORP_VALUE,
         name="ORP",
         device_class=SensorDeviceClass.VOLTAGE,
         native_unit_of_measurement=UnitOfElectricPotential.MILLIVOLT,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_SALINITY_VALUE,
         name="Salinity",
         icon="mdi:shaker-outline",
         native_unit_of_measurement=CONCENTRATION_PARTS_PER_MILLION,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_CPU_TEMPERATURE_VALUE,
@@ -201,6 +208,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_BOARD_TEMPERATURE_VALUE,
@@ -208,6 +216,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_WATER_TEMPERATURE_VALUE,
@@ -216,6 +225,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         icon="mdi:pool-thermometer",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_CELL_TEMPERATURE_VALUE,
@@ -223,6 +233,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ACID_PUMP_DAYS_LEFT,
@@ -241,6 +252,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
 ]
 
