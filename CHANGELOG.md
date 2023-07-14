@@ -4,6 +4,7 @@
 
 - Update sensor device class
 - Fix binary sensor state
+- Add sensor for salinity status and missing salt
 
 ## v1.0.3
 

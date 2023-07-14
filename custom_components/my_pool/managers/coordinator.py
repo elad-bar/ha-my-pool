@@ -17,16 +17,25 @@ from ..common.consts import (
     ACTION_ENTITY_TURN_ON,
     ATTR_ACTIONS,
     ATTR_IS_ON,
+    CONFIG_TECHNICIAN_POOL_SIZE,
     DATA_ITEM_CONFIG,
     DATA_ITEM_DEVICES,
     DATA_ITEM_MEMBER_DETAILS,
     DOMAIN,
     MANUFACTURER,
+    MAXIMUM_SALINITY_PPM,
+    MINIMUM_SALINITY_PPM,
+    NORMAL_SALINITY_PPM_RANGE,
+    PREFERRED_SALINITY_PPM,
     PRODUCT_PAGE,
     PRODUCT_URL,
     RUNTIME_DEVICE_ON,
     RUNTIME_DEVICE_TURBO,
     RUNTIME_DEVICE_TURBO_TIME,
+    RUNTIME_SALINITY_VALUE,
+    SALINITY_STATUS,
+    SALT_MISSING,
+    SALT_WEIGHT_FOR_PREFERRED_SALINITY,
     UNIT_PH,
 )
 from ..common.entity_descriptions import (
@@ -43,7 +52,7 @@ class Coordinator(DataUpdateCoordinator):
     """My custom coordinator."""
 
     _entity_descriptions: dict[Platform, list[EntityDescription]] | None
-    _data_retrievers: dict[Platform, Callable[[int, Any], dict]] | None
+    _data_retrievers: dict[Platform, Callable[[int, int, Any], dict]] | None
     _api: RestAPI | None
     _config_manager: ConfigManager
 
@@ -154,7 +163,20 @@ class Coordinator(DataUpdateCoordinator):
 
         return async_action
 
-    def _sensor_state_handler(self, state: int, entity_description):
+    def _load_data_retrievers(self):
+        data_retrievers = {
+            Platform.SENSOR: self._sensor_state_handler,
+            Platform.SELECT: self._select_state_handler,
+            Platform.BINARY_SENSOR: self._binary_sensor_state_handler,
+            Platform.SWITCH: self._switch_state_handler,
+            Platform.NUMBER: self._number_state_handler,
+        }
+
+        self._data_retrievers = data_retrievers
+
+    def _sensor_state_handler(
+        self, device_id: int | None, state: int, entity_description
+    ):
         if entity_description.device_class == SensorDeviceClass.TEMPERATURE:
             state_str = str(state)
             state_str_fixed = f"{state_str[:2]}.{state_str[2:].ljust(2, '0')}"
@@ -168,22 +190,28 @@ class Coordinator(DataUpdateCoordinator):
             state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
             state = float(state_str_fixed)
 
+        elif entity_description.key == SALT_MISSING:
+            device_data = self._api.get_device_data(device_id)
+            data = device_data.get("data")
+
+            pool_size = data.get(CONFIG_TECHNICIAN_POOL_SIZE)
+            current_salinity = data.get(RUNTIME_SALINITY_VALUE)
+
+            state = self._get_missing_salt(pool_size, current_salinity)
+
+        elif entity_description.key == SALINITY_STATUS:
+            device_data = self._api.get_device_data(device_id)
+            data = device_data.get("data")
+
+            current_salinity = data.get(RUNTIME_SALINITY_VALUE)
+
+            state = self._get_salinity_status(current_salinity)
+
         result = {ATTR_STATE: state}
 
         return result
 
-    def _load_data_retrievers(self):
-        data_retrievers = {
-            Platform.SENSOR: self._sensor_state_handler,
-            Platform.SELECT: self._select_state_handler,
-            Platform.BINARY_SENSOR: self._binary_sensor_state_handler,
-            Platform.SWITCH: self._switch_state_handler,
-            Platform.NUMBER: self._number_state_handler,
-        }
-
-        self._data_retrievers = data_retrievers
-
-    def _select_state_handler(self, state: int, _entity_description):
+    def _select_state_handler(self, _device_id: int, state: int, _entity_description):
         result = {
             ATTR_STATE: state,
             ATTR_ACTIONS: {ACTION_ENTITY_SELECT_OPTION: self._handle_select_action},
@@ -191,7 +219,9 @@ class Coordinator(DataUpdateCoordinator):
 
         return result
 
-    def _binary_sensor_state_handler(self, state: int, entity_description):
+    def _binary_sensor_state_handler(
+        self, _device_id: int, state: int, entity_description
+    ):
         on_value = entity_description.on_value
         is_on = str(on_value).lower() == str(state).lower()
 
@@ -199,7 +229,7 @@ class Coordinator(DataUpdateCoordinator):
 
         return result
 
-    def _switch_state_handler(self, state: int, entity_description):
+    def _switch_state_handler(self, _device_id: int, state: int, entity_description):
         on_value = entity_description.on_value
         is_on = str(on_value).lower() == str(state).lower()
 
@@ -213,7 +243,7 @@ class Coordinator(DataUpdateCoordinator):
 
         return result
 
-    def _number_state_handler(self, state: int, entity_description):
+    def _number_state_handler(self, _device_id: int, state: int, entity_description):
         if entity_description.native_unit_of_measurement == UNIT_PH:
             state_str = str(state)
             state_str_fixed = f"{state_str[:1]}.{state_str[1:].ljust(2, '0')}"
@@ -239,7 +269,7 @@ class Coordinator(DataUpdateCoordinator):
                 entity_description.platform, Platform.SENSOR
             )
 
-            result = data_retriever(state, entity_description)
+            result = data_retriever(device_id, state, entity_description)
 
         except Exception as ex:
             exc_type, exc_obj, tb = sys.exc_info()
@@ -316,3 +346,34 @@ class Coordinator(DataUpdateCoordinator):
         value: int,
     ):
         await self._api.set_value(device_id, entity_description.key, value)
+
+    @staticmethod
+    def _get_missing_salt(pool_size, salinity) -> float:
+        required_salt = pool_size * SALT_WEIGHT_FOR_PREFERRED_SALINITY
+        salinity_gap = 1 - (salinity / PREFERRED_SALINITY_PPM)
+        missing_salt = salinity_gap * required_salt
+
+        return missing_salt
+
+    @staticmethod
+    def _get_salinity_status(salinity) -> str | None:
+        status = None
+        normal_range_minimum = NORMAL_SALINITY_PPM_RANGE[0]
+        normal_range_maximum = NORMAL_SALINITY_PPM_RANGE[1]
+
+        if normal_range_minimum <= salinity <= normal_range_maximum:
+            status = "ok"
+
+        elif MAXIMUM_SALINITY_PPM >= salinity >= normal_range_minimum:
+            status = "normal_high"
+
+        elif normal_range_maximum >= salinity >= MINIMUM_SALINITY_PPM:
+            status = "normal_low"
+
+        elif salinity > MAXIMUM_SALINITY_PPM:
+            status = "very_high"
+
+        elif salinity < MINIMUM_SALINITY_PPM:
+            status = "very_low"
+
+        return status

@@ -334,22 +334,35 @@ class RestAPI:
         )
 
         if key in UPDATE_TELEMETRY_PARAMS:
-            key_parts = key.split("_")
+            key_parts = key.split("-")
 
             request_data = {
                 "_deviceId": device_id,
-                "data": {key_parts[0]: {key_parts[1]: {key_parts[2]: value}}},
+                "data": {},
             }
+
+            data_item = request_data["data"]
+
+            for key_part in key_parts:
+                data_item[key_part] = (
+                    int(value) if key_part == key_parts[len(key_parts) - 1] else {}
+                )
+
+                data_item = data_item[key_part]
 
             response = await self._post_request(Endpoints.UpdateTelemetry, request_data)
             success = response.get("success", False)
 
+            request_response = (
+                f"Request: {json.dumps(request_data)}, Response: {json.dumps(response)}"
+            )
+
             if success:
-                _LOGGER.info(f"Successfully {operation_description}")
-            else:
-                _LOGGER.error(
-                    f"Failed to {operation_description}, Data: {json.dumps(response)}"
+                _LOGGER.info(
+                    f"Successfully {operation_description}, {request_response}"
                 )
+            else:
+                _LOGGER.error(f"Failed to {operation_description}, {request_response}")
 
         else:
             _LOGGER.warning(f"Unsupported operation to {operation_description}")

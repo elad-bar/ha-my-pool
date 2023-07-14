@@ -26,6 +26,8 @@ from custom_components.my_pool.common.consts import (
     RUNTIME_PH_VALUE,
     RUNTIME_SALINITY_VALUE,
     RUNTIME_WATER_TEMPERATURE_VALUE,
+    SALINITY_STATUS,
+    SALT_MISSING,
     UNIT_PH,
 )
 from homeassistant.components.binary_sensor import (
@@ -47,6 +49,7 @@ from homeassistant.const import (
     EntityCategory,
     Platform,
     UnitOfElectricPotential,
+    UnitOfMass,
     UnitOfTemperature,
     UnitOfTime,
     UnitOfVolume,
@@ -136,11 +139,14 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_step=1,
         entity_category=EntityCategory.CONFIG,
     ),
-    IntegrationSensorEntityDescription(
+    IntegrationNumberEntityDescription(
         key=CONFIG_USER_CL,
         name="Chlorine Level",
         entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement=PERCENTAGE,
+        native_min_value=0,
+        native_max_value=100,
+        native_step=1,
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_TECHNICIAN_POOL_SIZE,
@@ -148,7 +154,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=NumberDeviceClass.WATER,
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         native_min_value=1,
-        native_max_value=100,
+        native_max_value=120,
         native_step=1,
         entity_category=EntityCategory.CONFIG,
         icon="mdi:move-resize",
@@ -252,6 +258,16 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         device_class=SensorDeviceClass.SIGNAL_STRENGTH,
         native_unit_of_measurement=SIGNAL_STRENGTH_DECIBELS,
         entity_category=EntityCategory.DIAGNOSTIC,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    IntegrationSensorEntityDescription(
+        key=SALINITY_STATUS, name="Salinity Status", device_class=None
+    ),
+    IntegrationSensorEntityDescription(
+        key=SALT_MISSING,
+        name="Salt Missing",
+        device_class=SensorDeviceClass.WEIGHT,
+        native_unit_of_measurement=UnitOfMass.KILOGRAMS,
         state_class=SensorStateClass.MEASUREMENT,
     ),
 ]

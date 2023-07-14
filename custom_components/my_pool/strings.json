@@ -17,19 +17,22 @@
   "entity": {
     "number": {
       "config_user_power": {
-        "name": "Power on Cover Closed"
+        "name": "Target Power (Cover Closed)"
       },
       "config_user_coverpower": {
-        "name": "Power on Cover Opened"
+        "name": "Target Power (Cover Opened)"
       },
       "config_user_ph": {
-        "name": "PH"
+        "name": "Target PH"
       },
       "config_user_orp": {
-        "name": "ORP"
+        "name": "Target ORP"
       },
       "config_technician_poolsize": {
         "name": "Pool Size"
+      },
+      "config_user_cl": {
+        "name": "Target Chlorine Level"
       }
     },
     "switch": {
@@ -91,8 +94,18 @@
       }
     },
     "sensor": {
-      "config_user_cl": {
-        "name": "Chlorine Level"
+      "salt_missing": {
+        "name": "Missing Salt"
+      },
+      "salinity_status": {
+        "name": "Salinity Status",
+        "state": {
+          "ok": "Normal",
+          "normal_high": "Normal High",
+          "normal_low": "Normal Low",
+          "very_low": "Very Low",
+          "very_high": "Very High"
+        }
       },
       "runtime_device_turbotime": {
         "name": "Turbo Time"

@@ -96,7 +96,7 @@ class BaseEntity(CoordinatorEntity):
             self._entity_description, self._device_id, key
         )
 
-        await async_device_action(*kwargs)
+        await async_device_action(key, self.entity_description, *kwargs)
 
         await self.coordinator.async_request_refresh()
 

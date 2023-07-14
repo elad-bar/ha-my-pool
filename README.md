@@ -1,6 +1,7 @@
-# Home Assistant integration to Magen Ecoenergy MyPool devices
+# Home Assistant integration to Magen Eco-energy My-Pool devices
 
-It allows view and controls the parameters from multiple accounts of mobile app
+Monitor ~~and control~~ your Resilience G/G+ devices using My-Pool (Magen Eco-energy) app from Home Assistant,
+Integration also calculates how much additional salt to add when needed.
 
 ## How to
 
@@ -10,7 +11,7 @@ Account for My-Pool
 
 #### Installations via HACS [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-- In HACS, look for "Aqua Temp" and install and restart
+- In HACS, look for "My-Pool" and install and restart
 - If integration was not found, please add custom repository `elad-bar/ha-my-pool` as integration
 - In Settings --> Devices & Services - (Lower Right) "Add Integration"
 
