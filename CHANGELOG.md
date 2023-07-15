@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.6
+
+- Set update interval to 5 minutes
+
 ## v1.0.5
 
 - Update sensor device class

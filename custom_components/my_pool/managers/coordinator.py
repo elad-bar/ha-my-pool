@@ -1,5 +1,4 @@
 from copy import copy
-from datetime import timedelta
 import logging
 import sys
 from typing import Any, Callable
@@ -37,6 +36,7 @@ from ..common.consts import (
     SALT_MISSING,
     SALT_WEIGHT_FOR_PREFERRED_SALINITY,
     UNIT_PH,
+    UPDATE_API,
 )
 from ..common.entity_descriptions import (
     DEFAULT_ENTITY_DESCRIPTIONS,
@@ -66,7 +66,7 @@ class Coordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=config_manager.name,
-            update_interval=timedelta(seconds=30),
+            update_interval=UPDATE_API,
             update_method=self._async_update_data,
         )
 
