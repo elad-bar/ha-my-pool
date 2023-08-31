@@ -378,7 +378,7 @@ class RestAPI:
             "data": payload,
         }
 
-        response = await self._post_request(Endpoints.UpdateTelemetry, request_data)
+        response = await self._post_request(Endpoints.DirectMethod, request_data)
         success = response.get("success", False)
 
         if success:
