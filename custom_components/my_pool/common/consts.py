@@ -81,3 +81,14 @@ NORMAL_SALINITY_PPM_RANGE = [3600, 4200]
 BASE_SALINITY_PPM = 1000
 SALT_WEIGHT_PER_SQM = 1
 SALT_WEIGHT_FOR_PREFERRED_SALINITY = PREFERRED_SALINITY_PPM / BASE_SALINITY_PPM
+
+TO_REDACT = [
+    "id",
+    "email",
+    "phoneNumber",
+    "hash",
+    "fcmToken",
+    "token",
+    "serialNumber",
+    "owner",
+]
