@@ -77,6 +77,10 @@ class Coordinator(DataUpdateCoordinator):
         self._data_retrievers = None
 
     @property
+    def api(self) -> RestAPI:
+        return self._api
+
+    @property
     def config_manager(self):
         return self._config_manager
 

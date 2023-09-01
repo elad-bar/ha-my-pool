@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Callable
 
 from custom_components.my_pool.common.consts import (
     CONFIG_AUTOMATION_CHANNEL_MODE,
@@ -14,16 +15,19 @@ from custom_components.my_pool.common.consts import (
     NETWORK_RCPI,
     NETWORK_SSID,
     RUNTIME_ACID_PUMP_DAYS_LEFT,
+    RUNTIME_AUTOMATION_PRESENT,
     RUNTIME_AUTOMATION_STATE_CHANNEL_STATE,
     RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT,
     RUNTIME_BOARD_TEMPERATURE_VALUE,
     RUNTIME_CELL_TEMPERATURE_VALUE,
+    RUNTIME_COVER_STATE,
     RUNTIME_CPU_TEMPERATURE_VALUE,
     RUNTIME_DEVICE_ON,
     RUNTIME_DEVICE_TURBO,
     RUNTIME_DEVICE_TURBO_TIME,
     RUNTIME_ORP_VALUE,
     RUNTIME_PH_VALUE,
+    RUNTIME_POWER,
     RUNTIME_SALINITY_VALUE,
     RUNTIME_WATER_TEMPERATURE_VALUE,
     SALINITY_STATUS,
@@ -60,6 +64,7 @@ from homeassistant.helpers.entity import EntityDescription
 @dataclass(slots=True)
 class IntegrationEntityDescription(EntityDescription):
     platform: Platform | None = None
+    filter: Callable[[dict], bool] | None = None
 
 
 @dataclass(slots=True)
@@ -100,11 +105,18 @@ class IntegrationSwitchEntityDescription(
     on_value: str | bool | None = None
 
 
+AUTOMATION_ENTITY_DESCRIPTION = IntegrationBinarySensorEntityDescription(
+    key=RUNTIME_AUTOMATION_PRESENT,
+    name="Automation",
+    on_value="1",
+)
+
 DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_POWER,
-        name="Power on Cover Closed",
+        name="Target Chlorine Output (Open)",
         device_class=NumberDeviceClass.POWER_FACTOR,
+        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=100,
@@ -112,8 +124,9 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_COVER_POWER,
-        name="Power on Cover Opened",
+        name="Target Chlorine Output (Closed)",
         device_class=NumberDeviceClass.POWER_FACTOR,
+        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=100,
@@ -141,7 +154,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationNumberEntityDescription(
         key=CONFIG_USER_CL,
-        name="Chlorine Level",
+        name="Target User Chlorine Output",
         entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement=PERCENTAGE,
         native_min_value=0,
@@ -170,6 +183,18 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         name="Connected",
         on_value=str(True).lower(),
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
+    ),
+    IntegrationSensorEntityDescription(
+        key=RUNTIME_POWER,
+        name="Chlorine Output",
+        device_class=SensorDeviceClass.POWER_FACTOR,
+        native_unit_of_measurement=PERCENTAGE,
+    ),
+    IntegrationBinarySensorEntityDescription(
+        key=RUNTIME_COVER_STATE,
+        name="Cover",
+        on_value="0",
+        device_class=BinarySensorDeviceClass.DOOR,
     ),
     IntegrationSwitchEntityDescription(
         key=RUNTIME_DEVICE_ON, name="Power", on_value="1"
@@ -243,7 +268,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
     ),
     IntegrationSensorEntityDescription(
         key=RUNTIME_ACID_PUMP_DAYS_LEFT,
-        name="Acid Pump Days Left",
+        name="Acid Pump Time Left",
         device_class=SensorDeviceClass.DURATION,
         native_unit_of_measurement=UnitOfTime.DAYS,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -270,6 +295,7 @@ DEFAULT_ENTITY_DESCRIPTIONS: list[IntegrationEntityDescription] = [
         native_unit_of_measurement=UnitOfMass.KILOGRAMS,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    AUTOMATION_ENTITY_DESCRIPTION,
 ]
 
 for i in range(1, 8):
@@ -280,12 +306,14 @@ for i in range(1, 8):
             name=f"Automation {i} Mode",
             entity_category=EntityCategory.CONFIG,
             options=["0"],
+            filter=lambda d: d.get(RUNTIME_AUTOMATION_PRESENT) == 0,
         ),
         IntegrationSwitchEntityDescription(
             key=CONFIG_AUTOMATION_CHANNEL_STATE.replace("*", index),
             name=f"Automation {i}",
             on_value="1",
             entity_category=EntityCategory.CONFIG,
+            filter=lambda d: d.get(RUNTIME_AUTOMATION_PRESENT) == 0,
         ),
         IntegrationSensorEntityDescription(
             key=RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT.replace("*", index),
@@ -293,12 +321,14 @@ for i in range(1, 8):
             device_class=SensorDeviceClass.DURATION,
             native_unit_of_measurement=UnitOfTime.MINUTES,
             entity_category=EntityCategory.DIAGNOSTIC,
+            filter=lambda d: d.get(RUNTIME_AUTOMATION_PRESENT) == 0,
         ),
         IntegrationBinarySensorEntityDescription(
             key=RUNTIME_AUTOMATION_STATE_CHANNEL_STATE.replace("*", index),
             name=f"Automation {i}",
             on_value="1",
             entity_category=EntityCategory.DIAGNOSTIC,
+            filter=lambda d: d.get(RUNTIME_AUTOMATION_PRESENT) == 0,
         ),
     ]
 

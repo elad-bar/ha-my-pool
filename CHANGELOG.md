@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.0.7
+
+- Automation entities will be available only when automation preset is available
+- Add Binary Sensor: Automation, represents state of automation preset
+- Add Binary Sensor: Cover, represents whether the cover is opened or closed
+- Add Sensor: Chlorine Output, represents the % of chlorine producing
+- Correct translations of entities
+
 ## v1.0.6
 
 - Set update interval to 5 minutes

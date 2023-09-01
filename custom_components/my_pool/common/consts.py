@@ -61,6 +61,9 @@ RUNTIME_AUTOMATION_STATE_CHANNEL_STATE = "runtime-automationState-channel*-state
 RUNTIME_AUTOMATION_STATE_CHANNEL_TIMELEFT = "runtime-automationState-channel*-timeLeft"
 SALINITY_STATUS = "salinity-status"
 SALT_MISSING = "salt-missing"
+RUNTIME_POWER = "runtime-power"
+RUNTIME_COVER_STATE = "runtime-coverState"
+RUNTIME_AUTOMATION_PRESENT = "runtime-automationPresent"
 
 UNIT_PH = "ph"
 

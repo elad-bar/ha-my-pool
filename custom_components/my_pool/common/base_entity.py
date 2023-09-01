@@ -29,11 +29,22 @@ def async_setup_entities(
         entities = []
 
         entity_descriptions = coordinator.get_entity_descriptions(platform)
+        device_data = coordinator.api.get_device_data(device_id)
+        data = device_data.get("data")
 
         for entity_description in entity_descriptions:
-            entity = entity_type(entity_description, coordinator, device_id)
+            ignore_entity = False
 
-            entities.append(entity)
+            if entity_description.filter is not None:
+                ignore_entity = entity_description.filter(data)
+
+            if ignore_entity:
+                _LOGGER.debug(f"Ignore entity {entity_description.key} due to filter")
+
+            else:
+                entity = entity_type(entity_description, coordinator, device_id)
+
+                entities.append(entity)
 
         _LOGGER.debug(f"Setting up {platform} entities: {entities}")
 
