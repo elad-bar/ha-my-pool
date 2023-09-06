@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.8
+
+- Limit number of decimal digits of missing salt sensor to 3
+
 ## v1.0.7
 
 - Automation entities will be available only when automation preset is available

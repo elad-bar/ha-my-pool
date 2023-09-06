@@ -356,8 +356,10 @@ class Coordinator(DataUpdateCoordinator):
         required_salt = pool_size * SALT_WEIGHT_FOR_PREFERRED_SALINITY
         salinity_gap = 1 - (salinity / PREFERRED_SALINITY_PPM)
         missing_salt = salinity_gap * required_salt
+        missing_salt_str = f"{missing_salt:.3f}"
+        result = float(missing_salt_str)
 
-        return missing_salt
+        return result
 
     @staticmethod
     def _get_salinity_status(salinity) -> str | None:
