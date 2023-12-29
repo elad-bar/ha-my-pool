@@ -1,4 +1,6 @@
 {
   "name": "My-Pool",
-  "render_readme": true
+  "render_readme": true,
+  "iot_class": "Cloud Polling",
+  "homeassistant": "2024.1.0"
 }
