@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.9
+
+_Minimum HA Version: 2024.1.0_
+
+- Adjust code to HA 2024.1.0
+- Update pre-commit packages
+
 ## v1.0.8
 
 - Limit number of decimal digits of missing salt sensor to 3

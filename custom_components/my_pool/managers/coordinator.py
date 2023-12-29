@@ -1,4 +1,3 @@
-from copy import copy
 import logging
 import sys
 from typing import Any, Callable
@@ -7,7 +6,6 @@ from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import ATTR_STATE, Platform
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util import slugify
 
 from ..common.consts import (
     ACTION_ENTITY_SELECT_OPTION,
@@ -291,13 +289,10 @@ class Coordinator(DataUpdateCoordinator):
         entity_descriptions = {}
 
         for entity_description in DEFAULT_ENTITY_DESCRIPTIONS:
-            ed = copy(entity_description)
-            ed.translation_key = slugify(ed.key)
+            if entity_description.platform not in entity_descriptions:
+                entity_descriptions[entity_description.platform] = []
 
-            if ed.platform not in entity_descriptions:
-                entity_descriptions[ed.platform] = []
-
-            entity_descriptions[ed.platform].append(ed)
+            entity_descriptions[entity_description.platform].append(entity_description)
 
         self._entity_descriptions = entity_descriptions
 
@@ -356,7 +351,7 @@ class Coordinator(DataUpdateCoordinator):
         required_salt = pool_size * SALT_WEIGHT_FOR_PREFERRED_SALINITY
         salinity_gap = 1 - (salinity / PREFERRED_SALINITY_PPM)
         missing_salt = salinity_gap * required_salt
-        missing_salt_str = f"{missing_salt:.3f}"
+        missing_salt_str = f"{missing_salt: .3f}"
         result = float(missing_salt_str)
 
         return result
