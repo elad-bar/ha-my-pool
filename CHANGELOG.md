@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.10
+
+- Remove discord notification from git hooks
+
 ## v1.0.9
 
 _Minimum HA Version: 2024.1.0_
