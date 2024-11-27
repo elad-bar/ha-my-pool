@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 f"Start loading {DOMAIN} integration, Entry ID: {entry.entry_id}"
             )
 
-            await coordinator.async_config_entry_first_refresh()
+            await coordinator.async_request_refresh()
 
             _LOGGER.info("Finished loading integration")
 
